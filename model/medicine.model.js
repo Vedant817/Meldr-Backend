@@ -11,6 +11,7 @@ const medicineSchema = new Schema({
     },
     discountPrice: {
         type: Number,
+        default: null
     },
     quantity: {
         type: Number,
@@ -27,7 +28,8 @@ const medicineSchema = new Schema({
                 return /^https:\/\//.test(v);
             },
             message: props => `${props.value} is not a valid URL!`
-        }
+        },
+        default: null
     }
 }
 );
