@@ -12,12 +12,23 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const createMedicine = async (req, res) => {
     try {
-        const { name, price, discountPrice, quantity, manufacturer, imageUrl } = req.body;
-        //TODO: Store image in S3 bucket and get the URL.
+        const { name, price, discountPrice, quantity, manufacturer } = req.body;
 
         if (!name || !price || !quantity || !manufacturer) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
+
+        if (req.file) {
+            const result = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream((error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                });
+                stream.end(req.file.buffer);
+            });
+        }
+
+        const imageUrl = result.secure_url || null;
 
         const newDocument = new Medicine({
             name,
