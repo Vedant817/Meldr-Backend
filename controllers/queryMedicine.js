@@ -20,41 +20,36 @@ export const searchMedicine = async (req, res) => {
 
 export const filterMedicine = async (req, res) => {
     try {
-        const { price, discountAvailable, quantityAbove, manufacturer } = req.query;
+        const { priceAbove, priceBelow, discountAvailable, quantityAbove, manufacturer } = req.query;
 
-        if (price) {
-            const abovePrice = await Medicine.find({ price: { $gte: price } });
-            const belowPrice = await Medicine.find({ price: { $lt: price } });
+        let query = {};
 
-            return res.status(200).json({
-                title1: 'Above Price',
-                abovePrice: abovePrice,
-                title2: 'Below Price',
-                belowPrice: belowPrice
-            });
+        if (priceAbove || priceBelow) {
+            query.price = {};
+            if (priceAbove) query.price.$gte = Number(priceAbove);
+            if (priceBelow) query.price.$lt = Number(priceBelow);
         }
 
-        if(discountAvailable){
-            const discountedMedicines = await Medicine.find({discountPrice: {$ne: null}});
-            return res.status(200).json({
-                discountedMedicines
-            });
+        if (discountAvailable === 'true') {
+            query.discountPrice = { $ne: null };
         }
 
-        if(quantityAbove){
-            const medicines = await Medicine.find({quantity: {$gte: quantityAbove}});
-            return res.status(200).json({
-                medicines
-            });
+        if (quantityAbove) {
+            query.quantity = { $gte: Number(quantityAbove) };
         }
 
-        if(manufacturer){
-            const medicines = await Medicine.find({manufacturer});
-            return res.status(200).json({
-                medicines
-            });
+        if (manufacturer) {
+            query.manufacturer = { $regex: new RegExp(manufacturer, 'i') };
         }
+
+        const medicines = await Medicine.find(query);
+
+        res.status(200).json({
+            count: medicines.length,
+            medicines: medicines
+        });
     } catch (error) {
-        console.log('Error occurred while filtering medicine', error);
+        console.error('Error occurred while filtering medicine', error);
+        res.status(500).json({ message: 'An error occurred while filtering medicines' });
     }
-}
+};
