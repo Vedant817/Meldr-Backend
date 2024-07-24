@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import validator from 'validator';
 
 const medicineSchema = new Schema({
     name: {
@@ -22,10 +23,10 @@ const medicineSchema = new Schema({
         required: true
     },
     imageUrl: {
-        type: mongoose.SchemaType.Url,
+        type: String,
         validate: {
             validator: function (v){
-                return /^https:\/\//.test(v);
+                return v=== null || validator.isURL(v);
             },
             message: props => `${props.value} is not a valid URL!`
         },
