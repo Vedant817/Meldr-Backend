@@ -1,8 +1,10 @@
 import redis from 'redis';
 
+let redisClient;
+
 const connectRedis = async () => {
     try {
-        const redisClient = redis.createClient({
+        redisClient = redis.createClient({
             host: 'localhost',
             port: 6379
         })
@@ -16,4 +18,4 @@ const connectRedis = async () => {
     }
 }
 
-export default connectRedis;
+export {connectRedis, redisClient};

@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./db/mongoDB.js";
 import medicineRoute from './routes.js'
-import connectRedis from "./db/redis.js";
+import { connectRedis } from "./db/redis.js";
 dotenv.config();
 
 const app = express();
@@ -21,7 +21,10 @@ connectDB().then(() => {
         app.listen(port, () => {
             console.log(`Server started at ${port}`);
         });
-    })
+    }).catch(err => {
+        console.log("Redis connection failed. Server not started.");
+        console.error(err);
+    });
 }).catch(err => {
     console.log("MongoDB connection failed. Server not started");
     console.error(err);
