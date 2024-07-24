@@ -53,3 +53,26 @@ export const filterMedicine = async (req, res) => {
         res.status(500).json({ message: 'An error occurred while filtering medicines' });
     }
 };
+
+export const sortMedicine = async (req, res) => {
+    try {
+        const { sortBy, order } = req.query;
+
+        let sortOption = {};
+
+        if (!['name', 'price', 'quantity'].includes(sortBy)) {
+            return res.status(400).json({ message: 'Invalid sort field. Use name, price, or quantity.' });
+        }
+
+        sortOption[sortBy] = order === 'desc' ? -1 : 1;
+        const medicines = await Medicine.find().sort(sortOption);
+
+        res.status(200).json({
+            count: medicines.length,
+            medicines: medicines
+        });
+    } catch (error) {
+        console.error('Error occurred while sorting medicines:', error);
+        res.status(500).json({ message: 'An error occurred while sorting medicines' });
+    }
+};
